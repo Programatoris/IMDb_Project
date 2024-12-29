@@ -113,7 +113,7 @@ SELECT DISTINCT
     CASE
         WHEN m.duration BETWEEN 0 AND 30 THEN 'short'
         WHEN m.duration BETWEEN 31 AND 90 THEN 'medium'
-        WHEN m.duration > 91 THEN 'long'
+        WHEN m.duration > 90 THEN 'long'
         ELSE 'unknown'
     END AS duration_score,
     CASE
