@@ -113,9 +113,15 @@ SELECT DISTINCT
     CASE
         WHEN m.duration BETWEEN 0 AND 30 THEN 'short'
         WHEN m.duration BETWEEN 31 AND 90 THEN 'medium'
-        WHEN m.duration BETWEEN 91 AND 300 THEN 'long'
+        WHEN m.duration > 91 THEN 'long'
         ELSE 'unknown'
-    END AS duration_score
+    END AS duration_score,
+    CASE
+        WHEN m.worldwide_gross_income BETWEEN 0 AND 500000 THEN 'poor'
+        WHEN m.worldwide_gross_income BETWEEN 500001 AND 5000000 THEN 'good'
+        WHEN m.worldwide_gross_income > 5000000 THEN 'great'
+        ELSE 'unknown'
+    END AS income_score
 FROM movie_staging m
 JOIN genre_staging g ON m.movie_id = g.movie_id;
 
