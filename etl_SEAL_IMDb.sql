@@ -150,10 +150,10 @@ SELECT
     CAST(m.date_published AS DATE) AS date,
     DATE_PART(day, m.date_published) AS day,
     DATE_PART(dow, m.date_published) + 1 AS day_of_week,
-    DATE_PART(month, m.date_published) AS month,
-    DATE_PART(year, m.date_published) AS year,
     DATE_PART(week, m.date_published) AS week,
+    DATE_PART(month, m.date_published) AS month,
     DATE_PART(quarter, m.date_published) AS quarter,
+    DATE_PART(year, m.date_published) AS year,
     CASE DATE_PART(dow, m.date_published) + 1
         WHEN 1 THEN 'Monday'
         WHEN 2 THEN 'Tuesday'
@@ -181,10 +181,10 @@ FROM movie_staging m
 GROUP BY CAST(m.date_published AS DATE), 
          DATE_PART(day, m.date_published), 
          DATE_PART(dow, m.date_published),
-         DATE_PART(month, m.date_published),
-         DATE_PART(year, m.date_published),
          DATE_PART(week, m.date_published),
-         DATE_PART(quarter, m.date_published);
+         DATE_PART(month, m.date_published),
+         DATE_PART(quarter, m.date_published),
+         DATE_PART(year, m.date_published);
 
 CREATE OR REPLACE TABLE DIM_TIME AS
 SELECT DISTINCT
