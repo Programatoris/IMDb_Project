@@ -109,7 +109,13 @@ SELECT DISTINCT
     m.languages,
     m.production_company,
     m.date_published,
-    g.genre
+    g.genre,
+    CASE
+        WHEN m.duration BETWEEN 0 AND 30 THEN 'short'
+        WHEN m.duration BETWEEN 31 AND 90 THEN 'medium'
+        WHEN m.duration BETWEEN 91 AND 300 THEN 'long'
+        ELSE 'unknown'
+    END AS duration_score
 FROM movie_staging m
 JOIN genre_staging g ON m.movie_id = g.movie_id;
 
@@ -121,7 +127,13 @@ SELECT DISTINCT
     n.date_of_birth,
     n.known_for_movies,
     r.category,
-    dm.movie_id AS starred_movie_id
+    dm.movie_id AS starred_movie_id,
+    CASE
+        WHEN EXTRACT(YEAR FROM CURRENT_DATE) - EXTRACT(YEAR FROM n.date_of_birth) <= 30 THEN 'young'
+        WHEN EXTRACT(YEAR FROM CURRENT_DATE) - EXTRACT(YEAR FROM n.date_of_birth) BETWEEN 31 AND 65 THEN 'middle-aged'
+        WHEN EXTRACT(YEAR FROM CURRENT_DATE) - EXTRACT(YEAR FROM n.date_of_birth) > 65 THEN 'senior'
+        ELSE 'unknown'
+    END AS age_category
 FROM names_staging n
 JOIN role_mapping_staging r ON r.name_id = n.name_id
 LEFT JOIN director_mapping_staging dm ON dm.name_id = n.name_id;
@@ -132,6 +144,10 @@ SELECT
     CAST(m.date_published AS DATE) AS date,
     DATE_PART(day, m.date_published) AS day,
     DATE_PART(dow, m.date_published) + 1 AS day_of_week,
+    DATE_PART(month, m.date_published) AS month,
+    DATE_PART(year, m.date_published) AS year,
+    DATE_PART(week, m.date_published) AS week,
+    DATE_PART(quarter, m.date_published) AS quarter,
     CASE DATE_PART(dow, m.date_published) + 1
         WHEN 1 THEN 'Monday'
         WHEN 2 THEN 'Tuesday'
@@ -141,7 +157,6 @@ SELECT
         WHEN 6 THEN 'Saturday'
         WHEN 7 THEN 'Sunday'
     END AS day_of_week_name,
-    DATE_PART(month, m.date_published) AS month,
     CASE DATE_PART(month, m.date_published)
         WHEN 1 THEN 'January'
         WHEN 2 THEN 'February'
@@ -155,10 +170,7 @@ SELECT
         WHEN 10 THEN 'October'
         WHEN 11 THEN 'November'
         WHEN 12 THEN 'December'
-    END AS month_name,
-    DATE_PART(year, m.date_published) AS year,
-    DATE_PART(week, m.date_published) AS week,
-    DATE_PART(quarter, m.date_published) AS quarter
+    END AS month_name
 FROM movie_staging m
 GROUP BY CAST(m.date_published AS DATE), 
          DATE_PART(day, m.date_published), 
@@ -192,7 +204,14 @@ SELECT
     d.dim_person_id AS person_id,
     date_dim.dim_date_id AS dim_dateId,
     time_dim.dim_time_id AS dim_timeId,
-    dim_movie.dim_movie_id AS dim_movie_id
+    dim_movie.dim_movie_id AS dim_movie_id,
+    CASE
+        WHEN r.avg_rating BETWEEN 0 AND 2.5 THEN 'bad'
+        WHEN r.avg_rating BETWEEN 2.6 AND 5.0 THEN 'average'
+        WHEN r.avg_rating BETWEEN 5.1 AND 7.5 THEN 'good'
+        WHEN r.avg_rating BETWEEN 7.6 AND 10 THEN 'great'
+        ELSE 'unknown'
+    END AS rating_score
 FROM ratings_staging r
 JOIN DIM_MOVIE dim_movie ON r.movie_id = dim_movie.dim_movie_id
 JOIN DIM_PERSON d ON d.starred_movie_id = r.movie_id
