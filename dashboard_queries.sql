@@ -28,7 +28,7 @@ SELECT
     ROUND(AVG(f.avg_rating), 2) AS avg_rating
 FROM FACT_MOVIE f
 JOIN DIM_MOVIE m ON f.fact_movie_id = m.dim_movie_id
-GROUP BY g.genre
+GROUP BY m.genre
 ORDER BY avg_income DESC;
 
 
@@ -52,6 +52,6 @@ SELECT
 FROM DIM_MOVIE m
 JOIN FACT_MOVIE f ON m.dim_movie_id = f.fact_movie_id
 WHERE m.duration IS NOT NULL 
-AND r.avg_rating IS NOT NULL
+AND f.avg_rating IS NOT NULL
 ORDER BY m.duration DESC
 LIMIT 10;
