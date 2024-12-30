@@ -94,7 +94,7 @@ FILE_FORMAT = (FORMAT_NAME = my_csv_format);
 Následné kopírovanie dát zo STAGE do staging tabuliek podľa custom formátu.
 ___
 
-### 3.2 Transformácia (T)
+### 3.2 Krok 2: Transformácia (T)
 V tomto kroku sa údaje transformujú, čo zahŕňa výpočty nových atribútov, agregáciu údajov a prípravu na načítanie do cieľových tabuliek (dimenzionálnych alebo faktových tabuliek).
 
 **SQL príkazy:**
@@ -194,7 +194,7 @@ JOIN DIM_TIME time_dim ON time_dim.timestamp = dim_movie.date_published;
   - Použiť príkaz CASE WHEN na kategorizáciu hodnotenia do kategórií ako 'zlý', 'priemerný', 'dobrý', 'skvelý'.
 ___
 
-### 3.3 Načítanie (L)
+### 3.3 Krok 3: Načítanie (L)
 V poslednom kroku sa transformované údaje načítajú do faktových a dimenzionálnych tabuliek, kde budú pripravené na analýzu. Následne po úspešnom načítaní transformovaných dát môžeme pôvodné tabuľky (staging) s raw dátami vymazať.
 ```sql
 DROP TABLE IF EXISTS director_mapping_staging;
