@@ -205,4 +205,88 @@ DROP TABLE IF EXISTS ratings_staging;
 DROP TABLE IF EXISTS role_mapping_staging;
 ```
 Príkaz DROP vymaže konkrétnu tabuľku aj s dátami, ktoré obsahuje. Tento príkaz je doplnení o podmienku IF EXISTS, ktorá predchádza prípadným chybám.
+___
 
+## 4 Vizualizácia dát
+### 4.1 Snowflake dashboard
+![dashboard_visualizations](https://github.com/user-attachments/assets/143bcc29-8181-4f10-b009-515d6b6e5bfa)
+
+Dashboard obsahuje **6 grafov**, ktoré obsahujú odpovede na otázky ako najviac vydaných filmov, počet ľudí vo filmovom priemysle podľa veku, porovnanie zárobku a hodnotenia filmov podľa žánru a podobne.
+___
+
+### 4.2 Popis a vysvetlenie jednotlivých grafov
+**1.) MOST MOVIES PRODUCED**
+```sql
+SELECT production_company, COUNT(*) AS movie_count
+FROM DIM_MOVIE
+GROUP BY production_company
+ORDER BY movie_count DESC
+LIMIT 10;
+```
+Tento graf zobrazuje počet filmov, ktoré každá produkčná spoločnosť vytvorila. Graf pomáha odpovedať na otázku, ktorá produkčná spoločnosť je najaktívnejšia v oblasti výroby filmov.
+
+**2.) DISTRIBUTION OF PEOPLE IN MOVIE INDUSTRY BY AGE**
+```sql
+SELECT age_category, COUNT(*) AS count
+FROM DIM_PERSON
+GROUP BY age_category
+ORDER BY count DESC;
+```
+Graf zobrazuje rozdelenie osôb pracujúcich v filmovom priemysle podľa vekových kategórií. Pomáha odpovedať na otázku, ako sú v priemysle zastúpené rôzne vekové skupiny. Ukazuje, ktoré vekové kategórie dominujú v rôznych oblastiach filmovej produkcie.
+
+**3.) MOVIE COUNT OVER THE YEARS**
+```sql
+SELECT year, COUNT(*) AS movie_count
+FROM DIM_DATE
+JOIN DIM_MOVIE ON DIM_DATE.date = DIM_MOVIE.date_published
+GROUP BY year
+ORDER BY year;
+```
+Tento graf zobrazuje počet filmov podľa rokov, v ktorých boli vydané. Pomáha zodpovedať otázku, ako sa počet vydaných filmov menil v priebehu rokov. Môže ukázať trend v rastúcom alebo klesajúcom počte produkcií počas času.
+
+**4.) Average Gross Income vs. Average Rating by Genre**
+```sql
+SELECT 
+    g.genre, 
+    ROUND(AVG(m.worldwide_gross_income), 2) AS avg_income, 
+    ROUND(AVG(f.avg_rating), 2) AS avg_rating
+FROM FACT_MOVIE f
+JOIN DIM_MOVIE m ON f.fact_movie_id = m.dim_movie_id
+JOIN genre_staging g ON m.dim_movie_id = g.movie_id
+GROUP BY g.genre
+ORDER BY avg_income DESC;
+```
+Tento graf porovnáva priemerný celosvetový zisk a priemerné hodnotenie podľa žánrov filmov. Pomáha zodpovedať otázku, ktoré žánre filmov majú najvyšší priemerný zisk a najvyššie hodnotenie. Ukazuje vzťah medzi finančným úspechom a kvalitou filmov v rôznych žánroch.
+
+**5.) Top 5 Directors by Average Rating**
+```sql
+SELECT 
+    p.name AS director_name, 
+    ROUND(AVG(f.avg_rating), 2) AS avg_rating, 
+    COUNT(*) AS movie_count
+FROM FACT_MOVIE f
+JOIN DIM_PERSON p ON f.person_id = p.dim_person_id
+JOIN director_mapping_staging dms ON p.dim_person_id = dms.name_id
+GROUP BY p.name
+ORDER BY avg_rating DESC
+LIMIT 5;
+```
+Tento graf zobrazuje päť režisérov s najvyšším priemerným hodnotením filmov. Pomáha zodpovedať otázku, ktorí režiséri dosiahli najlepšie hodnotenia od divákov. Zobrazuje tiež počet filmov, ktoré daní režiséri režírovali, čo môže naznačovať ich konzistenciu v tvorbe kvalitných filmov.
+
+**6.) Duration vs. Average Rating of Movies**
+```sql
+SELECT 
+    m.title, 
+    m.duration, 
+    r.avg_rating
+FROM DIM_MOVIE m
+JOIN ratings_staging r ON m.dim_movie_id = r.movie_id
+WHERE m.duration IS NOT NULL 
+AND r.avg_rating IS NOT NULL
+ORDER BY m.duration DESC
+LIMIT 10;
+```
+Tento graf zobrazuje vzťah medzi dĺžkou filmu a jeho priemerným hodnotením. Pomáha zodpovedať otázku, či existuje vzťah medzi trvaním filmu a jeho hodnotením. Môže ukázať, či dlhšie alebo kratšie filmy majú tendenciu získavať lepšie hodnotenia.
+___
+
+  - **Vypracoval:** Erik Martiš
