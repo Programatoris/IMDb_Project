@@ -195,5 +195,14 @@ JOIN DIM_TIME time_dim ON time_dim.timestamp = dim_movie.date_published;
 ___
 
 ### 3.3 Načítanie (L)
-V poslednom kroku sa transformované údaje načítajú do faktových a dimenzionálnych tabuliek, kde budú pripravené na analýzu.
+V poslednom kroku sa transformované údaje načítajú do faktových a dimenzionálnych tabuliek, kde budú pripravené na analýzu. Následne po úspešnom načítaní transformovaných dát môžeme pôvodné tabuľky (staging) s raw dátami vymazať.
+```sql
+DROP TABLE IF EXISTS director_mapping_staging;
+DROP TABLE IF EXISTS genre_staging;
+DROP TABLE IF EXISTS movie_staging;
+DROP TABLE IF EXISTS names_staging;
+DROP TABLE IF EXISTS ratings_staging;
+DROP TABLE IF EXISTS role_mapping_staging;
+```
+Príkaz DROP vymaže konkrétnu tabuľku aj s dátami, ktoré obsahuje. Tento príkaz je doplnení o podmienku IF EXISTS, ktorá predchádza prípadným chybám.
 
