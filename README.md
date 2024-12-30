@@ -134,10 +134,36 @@ JOIN genre_staging g ON m.movie_id = g.movie_id;
 ```
 **Účel:**
   - Vytvoriť tabuľku DIM_MOVIE, ktorá obsahuje unikátne záznamy o filmoch.
-  - Použiť príkaz CASE WHEN na kategorizáciu dĺžky filmu a hrubého príjmu do rôznych hodnôt, ako sú 'krátky', 'stredný', 'dlhý', 'chudobný', 'dobrý' a 'skvelý'.
+  - Použiť príkaz CASE WHEN na kategorizáciu dĺžky filmu a hrubého príjmu do rôznych hodnôt, ako sú 'krátky', 'stredný', 'dlhý', 'zlý', 'dobrý' a 'skvelý'.
   - Použiť JOIN na spájanie údajov o filmoch a žánroch.
 
-**Načítanie do faktovej tabuľky (FACT_MOVIE)**
+**Transformácia údajov o osobnostiach (DIM_PERSON)**
+```sql
+CREATE OR REPLACE TABLE DIM_PERSON AS
+SELECT DISTINCT
+    n.name_id AS dim_person_id,
+    n.name,
+    n.height,
+    n.date_of_birth,
+    n.known_for_movies,
+    r.category,
+    dm.movie_id AS starred_movie_id,
+    CASE
+        WHEN EXTRACT(YEAR FROM CURRENT_DATE) - EXTRACT(YEAR FROM n.date_of_birth) <= 30 THEN 'young'
+        WHEN EXTRACT(YEAR FROM CURRENT_DATE) - EXTRACT(YEAR FROM n.date_of_birth) BETWEEN 31 AND 65 THEN 'middle-aged'
+        WHEN EXTRACT(YEAR FROM CURRENT_DATE) - EXTRACT(YEAR FROM n.date_of_birth) > 65 THEN 'senior'
+        ELSE 'unknown'
+    END AS age_category
+FROM names_staging n
+JOIN role_mapping_staging r ON r.name_id = n.name_id
+LEFT JOIN director_mapping_staging dm ON dm.name_id = n.name_id;
+```
+**Účel:**
+  - Vytvoriť tabuľku DIM_PERSON, ktorá obsahuje podrobnejšie údaje o osobnostiach.
+  - Použiť príkaz CASE WHEN na kategorizáciu vekovej skupiny osôb, napr. 'mladý', 'stredného veku' a 'senior'.
+  - Použiť JOIN na spájanie údajov o rolách a menách.
+
+**Transformácia údajov v tabuľke (FACT_MOVIE)**
 ```sql
 CREATE OR REPLACE TABLE FACT_MOVIE AS
 SELECT 
