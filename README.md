@@ -99,7 +99,7 @@ V tomto kroku sa údaje transformujú, čo zahŕňa výpočty nových atribútov
 
 **SQL príkazy:**
   - `JOIN:` Používa sa na kombinovanie údajov zo súvisiacich tabuliek na základe spoločných polí, ako je movie_id alebo name_id.
-  - `CASE WHEN:` Tento príkaz sa využíva na kategorizáciu číselných alebo dátových polí na preddefinované skupiny (napr. kategorizácia dĺžky filmu alebo hrubého príjmu do kategórií ako 'krátky', 'stredný', 'dlhý' alebo 'chudobný', 'dobrý', 'skvelý').
+  - `CASE WHEN:` Tento príkaz sa využíva na kategorizáciu číselných alebo dátových polí na preddefinované skupiny (napr. kategorizácia dĺžky filmu alebo hrubého príjmu do kategórií ako 'krátky', 'stredný', 'dlhý' alebo 'zlý', 'dobrý', 'skvelý').
   - `EXTRACT a DATE_PART:` Používajú sa na manipuláciu s dátumami, napríklad na získanie roka, mesiaca a dňa z časovej pečiatky.
 
 
